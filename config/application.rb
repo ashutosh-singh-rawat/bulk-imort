@@ -16,7 +16,7 @@ require "sprockets/railtie"
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
-
+require 'csv'
 module BulkimportQuiz
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
@@ -28,6 +28,9 @@ module BulkimportQuiz
     # the framework and any gems in your application.
 
     # Don't generate system test files.
-    config.generators.system_tests = nil
+    config.generators.system_tests          = nil
+    config.active_job.queue_adapter         = :delayed_job
+    config.active_job.queue_name_prefix     = Rails.env
+    config.active_job.queue_name_delimiter  = '.'
   end
 end

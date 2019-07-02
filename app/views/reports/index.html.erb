@@ -1,0 +1,69 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Import</h1>
+<%= form_with(url: import_reports_path) do |form| %>
+  <% if @import_errors.present? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@import_errors.count, "error") %> prohibited some records from being saved:</h2>
+
+      <ul>
+      <% @import_errors.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :company %>
+    <%= form.select :company_id, options_for_select(Company.all.map{|c| [c.name, c.id]}, params[:company_id])  %>
+  </div>
+  <div class="field">
+    <%= form.label :file %>
+    <%= form.file_field :file %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit :import %>
+
+  </div>
+  <div id="import-div">
+  </div>
+
+<% end %>
+
+
+<h1>Data</h1>
+  <%= form_with(url: reports_path, local: true, method: :get, id: 'search_form') do |form| %>
+    <%= form.select :company_id, options_for_select(Company.all.map{|c| [c.name, c.id]}, params[:company_id])  %>
+    <div class="actions">
+      <%= form.submit :search %>
+    </div>
+  <% end %>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Report To</th>
+      <th>Assigned Policies</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @employees.each do |employee| %>
+      <tr>
+        <td><%= employee.name %></td>
+        <td><%= employee.email %></td>
+        <td><%= employee.phone %></td>
+        <td><%= employee.parent.try(:email) %></td>
+        <td><%= employee.policies.pluck(:name).join(' | ') %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Company', new_company_path %>

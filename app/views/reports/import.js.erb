@@ -1,0 +1,43 @@
+<% if @result %>
+  var pollingUrl = '<%=import_status_reports_path(token: @result.token) %>'
+  var element = $('#import-div');
+  var oldHtml = $(element).html();
+  element.html("<%= j render('loading') %>").append('<span class="progress"> </span>');
+  // ST.utils.baconStreamFromAjaxPolling(
+  //   {url: options.pollingUrl},
+  //   function(pollingResult) {
+  //     return pollingResult.status == 'finished';
+  //   }
+  // ).onValue(function (val) {
+  //   element.html(oldHtml);
+  //   downloadURI(val.url, 'export.csv');
+  // });
+  function executeQuery() {
+    $.ajax({
+      url:    pollingUrl,
+      success: function(data) {
+        if(data.status == 'finished'){
+          element.html(oldHtml);
+          downloadURI(data.url, 'errors.csv');
+        }else{
+          $('.progress').html(data.progress);
+          setTimeout(executeQuery, 5000);
+        }
+      }
+    });
+  }
+
+  setTimeout(executeQuery, 5000);
+
+  var downloadURI = function (uri, name) {
+    var link = document.createElement('a');
+    link.download = name;
+    link.href = uri;
+    document.body.appendChild(link);
+    setTimeout(function(){
+      document.body.removeChild(link);
+      link = null;
+      $('#search_form').submit();
+    }, 5000);link.click();
+  };
+<% end %>

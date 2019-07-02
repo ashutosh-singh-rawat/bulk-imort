@@ -1,6 +1,7 @@
 class Policy < ApplicationRecord
   belongs_to :company
-  has_and_belongs_to_many :employees
+  has_many :employees_policies
+  has_many :employees, through: :employees_policies
 
-  validates :name, uniqueness: true
+  validates :name, uniqueness: {scope: :company}
 end
